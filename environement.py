@@ -1,5 +1,6 @@
 from objects import *
-from Tkinter import *
+from tkinter import *
+from path import *
 
 class Board(Canvas):
 
@@ -21,6 +22,7 @@ class Board(Canvas):
 		self.start = True
 		self.delay = 90
 		self.msg = ""
+		self.pathLines = []
 
 		self.snake.initialize(1)
 
@@ -62,8 +64,26 @@ class Board(Canvas):
 			self.apple.move(0, 0)
 			while self.inSnake(self.apple):
 				self.apple.move(0, 0)
+		
+		snakePos = (self.snake[-1].y//10, self.snake[-1].x//10)
+		applePos = (self.apple.y//10, self.apple.x//10)
+		tab = self.getMat(self.snake, self.apple)
+		mat = Matrix(30, 30, tab)
+		print("lol")
+		path = next(mat.bfs_paths(snakePos, applePos))
+		self.drawPath(path)
 
-		self.after(self.delay, self.nextMove)
+		self.after(self.delay-int(len(self.snake)), self.nextMove)
+
+
+	def drawPath(self, path):
+		for line in self.pathLines:
+				self.delete(line)
+
+		for i in range(len(path)-1):
+			x1, y1 = path[i]
+			x2, y2 = path[i+1]
+			self.pathLines += [self.create_line(y1*10 + 5, x1*10 + 5, y2*10 + 5, x2*10 + 5)]
 
 	def end_game(self):
 
@@ -97,4 +117,25 @@ class Board(Canvas):
 			self.grid_b = False
 			for line in self.grid:
 				self.delete(line)
+
+	def getMat(self, snake, apple):
+		mat = []
+		snakePos = snake.getPos()
+		applePos = apple.getPos()
+
+		for i in range(len(snakePos)):
+			snakePos[i] = (snakePos[i][1], snakePos[i][0])
+		applePos = (applePos[1], applePos[0])
+
+		for i in range(30):
+			mat += [[]]
+			for j in range(30):
+				mat[i] += [0]
+		for pos in snakePos:
+			x, y = pos
+			mat[x][y] = 1
+		mat[snakePos[-1][1]][snakePos[-1][0]] = 0
+
+		return mat
+
 

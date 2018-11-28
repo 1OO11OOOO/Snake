@@ -1,4 +1,4 @@
-from Tkinter import *
+from tkinter import *
 from random import randint
 
 class Block():
@@ -75,7 +75,6 @@ class Snake(list):
 		self[ref].x, self[ref].y = x, y
 
 	def eat(self, apple):
-
 		self.score += int(1000/self.can.delay)
 		self.can.delete(self.score_msg)
 		self.score_msg = self.can.create_text(10+6*len(str(self.score)), 15, text="%d" % self.score, font="system 20 bold italic", fill='red')
@@ -91,6 +90,13 @@ class Snake(list):
 					self.can.start = False
 					self.can.snake.initialize(choice)
 					self.can.nextMove()
+
+	def getPos(self):
+		pos = []
+
+		for ref in range (0, len(self)):
+			pos.append((self[ref].x//10, self[ref].y//10))
+		return pos
 
 
 class Apple(Block):
@@ -110,6 +116,9 @@ class Apple(Block):
 
 		self.can.coords(self.tk_id, x, y, x+10, y+10)
 		self.x, self.y = x, y
+
+	def getPos(self):
+		return (self.x//10, self.y//10)
 
 	def __del__(self):
 		self.can.delete(self.tk_id)
